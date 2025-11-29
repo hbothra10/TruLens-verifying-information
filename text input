@@ -1,0 +1,89 @@
+import { useState } from 'react';
+import { Search, Sparkles } from 'lucide-react';
+
+interface TextInputProps {
+  onAnalyze: (text: string) => void;
+}
+
+export default function TextInput({ onAnalyze }: TextInputProps) {
+  const [text, setText] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (text.trim().length > 10) {
+      onAnalyze(text);
+    } else {
+      alert('Please enter at least 10 characters to analyze');
+    }
+  };
+
+  return (
+    <section className="py-16 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center space-x-2 bg-cyan-500/10 border border-cyan-400/30 rounded-full px-4 py-2 mb-6">
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span className="text-cyan-400 text-sm font-medium">AI-Powered Text Analysis</span>
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-4">Analyze Text Content</h2>
+          <p className="text-slate-300">Paste any news article, claim, or text to verify its authenticity</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="bg-slate-800/50 backdrop-blur-md rounded-2xl p-8 border border-slate-700/50">
+          <div className="mb-6">
+            <label htmlFor="text-input" className="block text-white font-semibold mb-3">
+              Enter Text to Analyze
+            </label>
+            <textarea
+              id="text-input"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Paste your news article, social media post, or any text content here..."
+              className="w-full h-64 bg-slate-900/50 border border-slate-600 rounded-xl p-4 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all resize-none"
+              required
+            />
+            <div className="flex items-center justify-between mt-2">
+              <p className="text-slate-400 text-sm">
+                {text.length} characters
+              </p>
+              <p className="text-slate-400 text-sm">
+                Minimum 10 characters required
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={text.trim().length < 10}
+            className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 disabled:transform-none flex items-center justify-center space-x-2"
+          >
+            <Search className="w-5 h-5" />
+            <span>Analyze Text</span>
+          </button>
+        </form>
+
+        <div className="mt-8 bg-cyan-500/10 border border-cyan-400/30 rounded-xl p-6">
+          <h3 className="text-white font-semibold mb-3">What we analyze:</h3>
+          <ul className="space-y-2 text-slate-300">
+            <li className="flex items-start space-x-2">
+              <span className="text-cyan-400 mt-1">•</span>
+              <span>Fact-checking against reliable sources</span>
+            </li>
+            <li className="flex items-start space-x-2">
+              <span className="text-cyan-400 mt-1">•</span>
+              <span>Detection of misleading claims and misinformation</span>
+            </li>
+            <li className="flex items-start space-x-2">
+              <span className="text-cyan-400 mt-1">•</span>
+              <span>Bias and sentiment analysis</span>
+            </li>
+            <li className="flex items-start space-x-2">
+              <span className="text-cyan-400 mt-1">•</span>
+              <span>Source credibility assessment</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}

@@ -1,0 +1,125 @@
+import { useState } from 'react';
+import { Link, Loader2 } from 'lucide-react';
+
+interface URLInputProps {
+  onAnalyze: (url: string) => void;
+  isAnalyzing: boolean;
+}
+
+export default function URLInput({ onAnalyze, isAnalyzing }: URLInputProps) {
+  const [url, setUrl] = useState('');
+  const [error, setError] = useState('');
+
+  const isValidUrl = (urlString: string) => {
+    try {
+      const urlObj = new URL(urlString);
+      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!url.trim()) {
+      setError('Please enter a URL');
+      return;
+    }
+
+    if (!isValidUrl(url.trim())) {
+      setError('Please enter a valid URL (must start with http:// or https://)');
+      return;
+    }
+
+    setError('');
+    onAnalyze(url.trim());
+  };
+
+  return (
+    <section className="py-16 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-slate-800/50 backdrop-blur-md rounded-2xl p-8 border border-slate-700/50">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="p-3 bg-cyan-400/20 rounded-lg">
+              <Link className="w-6 h-6 text-cyan-400" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white">Verify Website URL</h2>
+              <p className="text-slate-400 text-sm">Paste a website link to analyze its credibility and content</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="url-input" className="block text-sm font-medium text-slate-300 mb-2">
+                Website URL
+              </label>
+              <input
+                id="url-input"
+                type="text"
+                value={url}
+                onChange={(e) => {
+                  setUrl(e.target.value);
+                  setError('');
+                }}
+                placeholder="https://example.com/article"
+                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
+                disabled={isAnalyzing}
+              />
+              {error && (
+                <p className="mt-2 text-sm text-red-400">{error}</p>
+              )}
+            </div>
+
+            <div className="bg-slate-900/30 rounded-lg p-4 border border-slate-700/50">
+              <h4 className="text-sm font-semibold text-white mb-2">What we analyze:</h4>
+              <ul className="space-y-1 text-sm text-slate-400">
+                <li className="flex items-start space-x-2">
+                  <span className="text-cyan-400 mt-0.5">•</span>
+                  <span>Domain reputation and credibility</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-cyan-400 mt-0.5">•</span>
+                  <span>Website content authenticity</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-cyan-400 mt-0.5">•</span>
+                  <span>Potential phishing or malicious indicators</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-cyan-400 mt-0.5">•</span>
+                  <span>Source reliability and bias detection</span>
+                </li>
+              </ul>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isAnalyzing || !url.trim()}
+              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            >
+              {isAnalyzing ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Analyzing URL...</span>
+                </>
+              ) : (
+                <>
+                  <Link className="w-5 h-5" />
+                  <span>Verify URL</span>
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 p-4 bg-cyan-500/10 border border-cyan-400/30 rounded-lg">
+            <p className="text-sm text-slate-300">
+              <span className="font-semibold text-cyan-400">Privacy Note:</span> We analyze the publicly available content from the URL. No personal data is collected or stored.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

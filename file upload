@@ -1,0 +1,179 @@
+import { useState, useRef } from 'react';
+import { Upload, FileImage, FileVideo, FileAudio, X } from 'lucide-react';
+
+interface FileUploadProps {
+  onFileUpload: (file: File) => void;
+}
+
+export default function FileUpload({ onFileUpload }: FileUploadProps) {
+  const [dragActive, setDragActive] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleFile = (file: File) => {
+    const validTypes = ['image/jpeg', 'image/png', 'video/mp4', 'audio/mpeg', 'audio/mp3'];
+    const validExtensions = ['.jpg', '.jpeg', '.png', '.mp4', '.mp3'];
+    const fileName = file.name.toLowerCase();
+    const isValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
+    const isValidType = validTypes.includes(file.type) || isValidExtension;
+
+    if (isValidType) {
+      setSelectedFile(file);
+    } else {
+      alert('Please upload a valid file: JPG, PNG, MP3, or MP4');
+    }
+  };
+
+  const handleSubmit = () => {
+    if (selectedFile) {
+      onFileUpload(selectedFile);
+    }
+  };
+
+  const handleReset = () => {
+    setSelectedFile(null);
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+  };
+
+  const getFileIcon = () => {
+    if (!selectedFile) return <Upload className="w-12 h-12 text-cyan-400" />;
+
+    const type = selectedFile.type;
+    if (type.startsWith('image/')) return <FileImage className="w-12 h-12 text-cyan-400" />;
+    if (type.startsWith('video/')) return <FileVideo className="w-12 h-12 text-cyan-400" />;
+    if (type.startsWith('audio/')) return <FileAudio className="w-12 h-12 text-cyan-400" />;
+    return <Upload className="w-12 h-12 text-cyan-400" />;
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
+  return (
+    <div className="w-full">
+      <form
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+        onSubmit={(e) => e.preventDefault()}
+        className="relative"
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          id="file-upload"
+          accept=".jpg,.jpeg,.png,.mp4,.mp3"
+          onChange={handleChange}
+          className="hidden"
+        />
+
+        <label
+          htmlFor="file-upload"
+          className={`
+            flex flex-col items-center justify-center w-full min-h-[400px]
+            bg-slate-800/30 backdrop-blur-sm border-2 border-dashed rounded-2xl
+            cursor-pointer transition-all duration-300
+            ${dragActive ? 'border-cyan-400 bg-cyan-400/10' : 'border-slate-600 hover:border-cyan-400/50 hover:bg-slate-800/50'}
+          `}
+        >
+          <div className="flex flex-col items-center justify-center p-8 text-center">
+            <div className="mb-6">
+              {getFileIcon()}
+            </div>
+
+            {!selectedFile ? (
+              <>
+                <p className="mb-2 text-xl font-semibold text-white">
+                  Drop your file here or click to browse
+                </p>
+                <p className="text-slate-400 mb-6">
+                  Supports JPG, PNG, MP3, MP4 files
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <span className="px-3 py-1 bg-slate-700/50 rounded-full text-sm text-slate-300">.jpg</span>
+                  <span className="px-3 py-1 bg-slate-700/50 rounded-full text-sm text-slate-300">.png</span>
+                  <span className="px-3 py-1 bg-slate-700/50 rounded-full text-sm text-slate-300">.mp3</span>
+                  <span className="px-3 py-1 bg-slate-700/50 rounded-full text-sm text-slate-300">.mp4</span>
+                </div>
+              </>
+            ) : (
+              <div className="w-full max-w-md">
+                <div className="bg-slate-700/30 rounded-xl p-6 border border-slate-600">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1 min-w-0 mr-4">
+                      <p className="text-white font-semibold truncate mb-1">
+                        {selectedFile.name}
+                      </p>
+                      <p className="text-slate-400 text-sm">
+                        {formatFileSize(selectedFile.size)}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleReset();
+                      }}
+                      className="flex-shrink-0 p-2 hover:bg-slate-600/50 rounded-lg transition-colors"
+                    >
+                      <X className="w-5 h-5 text-slate-400 hover:text-white" />
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleSubmit();
+                    }}
+                    className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105"
+                  >
+                    Analyze File
+                  </button>
+                </div>
+
+                <p className="text-slate-400 text-sm mt-4">
+                  Click "Analyze File" to begin verification
+                </p>
+              </div>
+            )}
+          </div>
+        </label>
+      </form>
+    </div>
+  );
+}

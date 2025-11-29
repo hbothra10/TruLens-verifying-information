@@ -1,0 +1,34 @@
+import { Shield, Sparkles } from 'lucide-react';
+
+export default function Hero() {
+  return (
+    <section className="relative overflow-hidden py-20 px-4">
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-transparent to-transparent"></div>
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-700"></div>
+      </div>
+
+      <div className="max-w-5xl mx-auto text-center relative z-10">
+        <div className="inline-flex items-center space-x-2 bg-cyan-500/10 border border-cyan-400/30 rounded-full px-4 py-2 mb-8">
+          <Sparkles className="w-4 h-4 text-cyan-400" />
+          <span className="text-cyan-400 text-sm font-medium">Advanced AI Detection Technology</span>
+        </div>
+
+        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+          Verify Truth in a World of
+          <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text"> Deception</span>
+        </h1>
+
+        <p className="text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+          Detect fake news, deepfake images, and manipulated videos with cutting-edge AI analysis. Stay informed. Stay protected.
+        </p>
+
+        <div className="flex items-center justify-center space-x-2 text-cyan-400">
+          <Shield className="w-5 h-5" />
+          <p className="text-lg font-semibold">When news lie, we verify</p>
+        </div>
+      </div>
+    </section>
+  );
+}

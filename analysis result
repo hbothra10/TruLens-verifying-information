@@ -1,0 +1,226 @@
+import { CheckCircle, AlertTriangle, XCircle, Shield, TrendingUp, Eye, Activity, FileText } from 'lucide-react';
+import FactCheckSection from './FactCheckSection';
+import { getTranslation } from '../utils/translations';
+
+interface FactCheckResult {
+  claim: string;
+  verdict: string;
+  explanation: string;
+  correctedStatement?: string;
+  sources: Array<{
+    name: string;
+    url: string;
+    credibility: string;
+  }>;
+}
+
+interface AnalysisResultProps {
+  data: {
+    authenticityScore: number;
+    isAuthentic: boolean;
+    isWarning: boolean;
+    detectionMetrics: Array<{
+      label: string;
+      score: number;
+    }>;
+    findings: string[];
+    recommendation: string;
+    analysisTime: string;
+    detectedLanguage?: string;
+    content?: string;
+    file?: File;
+    factCheck?: FactCheckResult;
+  };
+  type: 'text' | 'media';
+  onReset: () => void;
+}
+
+export default function AnalysisResult({ data, type }: AnalysisResultProps) {
+  const { authenticityScore, isAuthentic, isWarning, detectionMetrics, findings, recommendation, analysisTime, detectedLanguage, content, file, factCheck } = data;
+
+  const getStatusIcon = () => {
+    if (isAuthentic) return <CheckCircle className="w-16 h-16 text-green-400" />;
+    if (isWarning) return <AlertTriangle className="w-16 h-16 text-yellow-400" />;
+    return <XCircle className="w-16 h-16 text-red-400" />;
+  };
+
+  const getStatusText = () => {
+    if (isAuthentic) return getTranslation(detectedLanguage, 'likelyAuthentic');
+    if (isWarning) return getTranslation(detectedLanguage, 'potentiallyManipulated');
+    return getTranslation(detectedLanguage, 'highRiskFake');
+  };
+
+  const getStatusDescription = () => {
+    if (isAuthentic) return getTranslation(detectedLanguage, 'authenticDescription');
+    if (isWarning) return getTranslation(detectedLanguage, 'warningDescription');
+    return getTranslation(detectedLanguage, 'fakeDescription');
+  };
+
+  const metricIcons = [Shield, Eye, Activity, TrendingUp];
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-slate-800/50 backdrop-blur-md rounded-2xl p-8 border border-slate-700/50">
+        <div className="flex flex-col items-center text-center mb-8">
+          <div className="mb-4">
+            {getStatusIcon()}
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-2">{getStatusText()}</h2>
+          <p className="text-slate-300 max-w-2xl">{getStatusDescription()}</p>
+        </div>
+
+        <div className="bg-slate-900/50 rounded-xl p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-slate-300 font-medium">{getTranslation(detectedLanguage, 'authenticityScore')}</span>
+            <span className={`text-2xl font-bold ${
+              isAuthentic ? 'text-green-400' : isWarning ? 'text-yellow-400' : 'text-red-400'
+            }`}>
+              {authenticityScore}%
+            </span>
+          </div>
+          <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-1000 ${
+                isAuthentic
+                  ? 'bg-gradient-to-r from-green-400 to-green-600'
+                  : isWarning
+                  ? 'bg-gradient-to-r from-yellow-400 to-yellow-600'
+                  : 'bg-gradient-to-r from-red-400 to-red-600'
+              }`}
+              style={{ width: `${authenticityScore}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <h3 className="text-xl font-bold text-white mb-4">
+            {type === 'text' ? getTranslation(detectedLanguage, 'textInformation') : getTranslation(detectedLanguage, 'fileInformation')}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {type === 'text' ? (
+              <>
+                <div className="bg-slate-900/50 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm mb-1">{getTranslation(detectedLanguage, 'contentType')}</p>
+                  <p className="text-white font-medium">{getTranslation(detectedLanguage, 'textAnalysis')}</p>
+                </div>
+                <div className="bg-slate-900/50 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm mb-1">{getTranslation(detectedLanguage, 'wordCount')}</p>
+                  <p className="text-white font-medium">
+                    {content ? content.split(/\s+/).length : 0} {getTranslation(detectedLanguage, 'words')}
+                  </p>
+                </div>
+                <div className="bg-slate-900/50 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm mb-1">{getTranslation(detectedLanguage, 'characterCount')}</p>
+                  <p className="text-white font-medium">{content?.length || 0} {getTranslation(detectedLanguage, 'characters')}</p>
+                </div>
+                <div className="bg-slate-900/50 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm mb-1">Analysis Time</p>
+                  <p className="text-white font-medium">{analysisTime}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="bg-slate-900/50 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm mb-1">{getTranslation(detectedLanguage, 'fileName')}</p>
+                  <p className="text-white font-medium truncate">{file?.name}</p>
+                </div>
+                <div className="bg-slate-900/50 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm mb-1">{getTranslation(detectedLanguage, 'fileType')}</p>
+                  <p className="text-white font-medium">
+                    {file?.type.startsWith('image/') ? 'Image' :
+                     file?.type.startsWith('video/') ? 'Video' :
+                     file?.type.startsWith('audio/') ? 'Audio' : 'Unknown'}
+                  </p>
+                </div>
+                <div className="bg-slate-900/50 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm mb-1">{getTranslation(detectedLanguage, 'fileSize')}</p>
+                  <p className="text-white font-medium">
+                    {file ? (file.size / 1024 / 1024).toFixed(2) : 0} MB
+                  </p>
+                </div>
+                <div className="bg-slate-900/50 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm mb-1">Analysis Time</p>
+                  <p className="text-white font-medium">{analysisTime}</p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-slate-800/50 backdrop-blur-md rounded-2xl p-8 border border-slate-700/50">
+        <h3 className="text-xl font-bold text-white mb-6">{getTranslation(detectedLanguage, 'detectionMetrics')}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {detectionMetrics.map((metric, index) => {
+            const Icon = metricIcons[index % metricIcons.length];
+            return (
+              <div key={index} className="bg-slate-900/50 rounded-lg p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-cyan-400/20 rounded-lg">
+                      <Icon className="w-5 h-5 text-cyan-400" />
+                    </div>
+                    <span className="text-white font-medium">{getTranslation(detectedLanguage, metric.label.toLowerCase().replace(/\s+/g, ''))}</span>
+                  </div>
+                  <span className="text-cyan-400 font-bold">{metric.score}%</span>
+                </div>
+                <div className="w-full bg-slate-700/50 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-cyan-400 to-blue-500 h-full rounded-full transition-all duration-1000"
+                    style={{ width: `${metric.score}%` }}
+                  ></div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {content && type === 'text' && (
+        <div className="bg-slate-800/50 backdrop-blur-md rounded-2xl p-8 border border-slate-700/50">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center space-x-2">
+            <FileText className="w-6 h-6 text-cyan-400" />
+            <span>{getTranslation(detectedLanguage, 'analyzedContent')}</span>
+          </h3>
+          <div className="bg-slate-900/50 rounded-lg p-6 max-h-64 overflow-y-auto">
+            <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{content}</p>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-slate-800/50 backdrop-blur-md rounded-2xl p-8 border border-slate-700/50">
+        <h3 className="text-xl font-bold text-white mb-6">{getTranslation(detectedLanguage, 'keyFindings')}</h3>
+        <div className="space-y-3">
+          {findings.map((finding, index) => (
+            <div key={index} className="flex items-start space-x-3 bg-slate-900/50 rounded-lg p-4">
+              <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+                isAuthentic ? 'bg-green-400/20' : 'bg-red-400/20'
+              }`}>
+                {isAuthentic ? (
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                ) : (
+                  <AlertTriangle className="w-4 h-4 text-red-400" />
+                )}
+              </div>
+              <p className="text-slate-300 flex-1">{finding}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {factCheck && (
+        <FactCheckSection factCheck={factCheck} detectedLanguage={detectedLanguage} />
+      )}
+
+      <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 backdrop-blur-md rounded-2xl p-8 border border-cyan-400/30">
+        <div className="flex items-start space-x-4">
+          <Shield className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-1" />
+          <div>
+            <h4 className="text-lg font-bold text-white mb-2">{getTranslation(detectedLanguage, 'aiRecommendation')}</h4>
+            <p className="text-slate-300 leading-relaxed">{recommendation}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

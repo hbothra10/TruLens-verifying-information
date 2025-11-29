@@ -1,0 +1,81 @@
+import { FileText, Image, Link } from 'lucide-react';
+
+interface InputTypeSelectorProps {
+  onSelectType: (type: 'text' | 'media' | 'url') => void;
+}
+
+export default function InputTypeSelector({ onSelectType }: InputTypeSelectorProps) {
+  return (
+    <section className="py-16 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-white mb-4">Choose Analysis Type</h2>
+          <p className="text-slate-300 text-lg">Select how you want to verify content</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <button
+            onClick={() => onSelectType('text')}
+            className="group bg-slate-800/30 backdrop-blur-sm border-2 border-slate-700/50 rounded-2xl p-12 hover:bg-slate-800/50 hover:border-cyan-400/50 transition-all duration-300 hover:transform hover:-translate-y-2 text-left"
+          >
+            <div className="mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                <FileText className="w-8 h-8 text-cyan-400" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-3">Analyze Text</h3>
+            <p className="text-slate-300 leading-relaxed mb-4">
+              Paste news articles, social media posts, or any text content to check for misinformation, bias, and credibility.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-sm text-cyan-400">News Articles</span>
+              <span className="px-3 py-1 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-sm text-cyan-400">Social Posts</span>
+              <span className="px-3 py-1 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-sm text-cyan-400">Claims</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => onSelectType('media')}
+            className="group bg-slate-800/30 backdrop-blur-sm border-2 border-slate-700/50 rounded-2xl p-12 hover:bg-slate-800/50 hover:border-cyan-400/50 transition-all duration-300 hover:transform hover:-translate-y-2 text-left"
+          >
+            <div className="mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                <Image className="w-8 h-8 text-cyan-400" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-3">Analyze Media</h3>
+            <p className="text-slate-300 leading-relaxed mb-4">
+              Upload images, videos, or audio files to detect deepfakes, manipulations, and AI-generated content.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-sm text-cyan-400">.jpg</span>
+              <span className="px-3 py-1 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-sm text-cyan-400">.png</span>
+              <span className="px-3 py-1 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-sm text-cyan-400">.mp3</span>
+              <span className="px-3 py-1 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-sm text-cyan-400">.mp4</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => onSelectType('url')}
+            className="group bg-slate-800/30 backdrop-blur-sm border-2 border-slate-700/50 rounded-2xl p-12 hover:bg-slate-800/50 hover:border-cyan-400/50 transition-all duration-300 hover:transform hover:-translate-y-2 text-left"
+          >
+            <div className="mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                <Link className="w-8 h-8 text-cyan-400" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-3">Verify URL</h3>
+            <p className="text-slate-300 leading-relaxed mb-4">
+              Paste a website URL or link to check domain credibility, content authenticity, and potential phishing risks.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-sm text-cyan-400">Website Links</span>
+              <span className="px-3 py-1 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-sm text-cyan-400">News URLs</span>
+              <span className="px-3 py-1 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-sm text-cyan-400">Shared Links</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
